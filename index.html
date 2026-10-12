@@ -1,0 +1,1233 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>창호 및 유리공사 수량 산출 마스터</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Google Fonts: Inter & Noto Sans KR -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Noto Sans KR', 'Inter', sans-serif;
+    }
+    .perspective {
+      perspective: 1000px;
+    }
+    .transform-style-preserve-3d {
+      transform-style: preserve-3d;
+    }
+    .backface-hidden {
+      backface-visibility: hidden;
+    }
+    .rotate-y-180 {
+      transform: rotateY(180deg);
+    }
+    .scrollbar-hide::-webkit-scrollbar {
+      display: none;
+    }
+    .scrollbar-hide {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+    /* Blueprint Background Pattern */
+    .blueprint-grid {
+      background-size: 24px 24px;
+      background-image: 
+        linear-gradient(to right, rgba(99, 102, 241, 0.05) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(99, 102, 241, 0.05) 1px, transparent 1px);
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col antialiased blueprint-grid selection:bg-indigo-500 selection:text-white">
+
+  <!-- Top Navigation Bar -->
+  <header class="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-slate-200/80 shadow-sm transition-all">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-blue-500 flex items-center justify-center text-white shadow-md shadow-indigo-200">
+          <i class="fa-solid fa-shapes text-lg"></i>
+        </div>
+        <div>
+          <h1 class="text-base sm:text-lg font-extrabold text-slate-900 tracking-tight flex items-center gap-2">
+            창호 및 유리공사 <span class="hidden sm:inline text-xs font-semibold px-2 py-0.5 bg-indigo-50 text-indigo-700 rounded-full border border-indigo-200">적산 마스터</span>
+          </h1>
+          <p class="text-xs text-slate-500 hidden sm:block">실무 수량 산출 및 적산 핵심 공학 인터랙티브 학습기</p>
+        </div>
+      </div>
+
+      <!-- Quick Action Badges -->
+      <div class="flex items-center gap-2">
+        <button id="calculatorQuickBtn" class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg shadow-sm transition shadow-indigo-100">
+          <i class="fa-solid fa-calculator"></i>
+          <span>실무 계산기</span>
+        </button>
+        <a href="https://youtu.be/fkRoxFvoces" target="_blank" rel="noopener noreferrer" class="hidden md:flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-600 hover:text-red-600 bg-slate-100 hover:bg-red-50 rounded-lg transition border border-slate-200">
+          <i class="fa-brands fa-youtube text-red-500"></i>
+          <span>원문 강의</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Sub Navigation Tabs -->
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 flex overflow-x-auto scrollbar-hide space-x-2 border-t border-slate-100 py-1.5 text-sm font-medium">
+      <button class="nav-tab active-tab px-3.5 py-1.5 rounded-lg text-slate-600 hover:text-indigo-600 hover:bg-indigo-50/70 transition flex items-center gap-2 whitespace-nowrap" data-target="tab-summary">
+        <i class="fa-solid fa-book-open text-xs"></i> 1. 핵심 요약
+      </button>
+      <button class="nav-tab px-3.5 py-1.5 rounded-lg text-slate-600 hover:text-indigo-600 hover:bg-indigo-50/70 transition flex items-center gap-2 whitespace-nowrap" data-target="tab-flashcard">
+        <i class="fa-solid fa-layer-group text-xs"></i> 2. 플래시카드 <span class="bg-indigo-100 text-indigo-700 text-[10px] font-bold px-1.5 py-0.2 rounded-full">10</span>
+      </button>
+      <button class="nav-tab px-3.5 py-1.5 rounded-lg text-slate-600 hover:text-indigo-600 hover:bg-indigo-50/70 transition flex items-center gap-2 whitespace-nowrap" data-target="tab-quiz">
+        <i class="fa-solid fa-circle-question text-xs"></i> 3. 이해도 퀴즈 <span class="bg-emerald-100 text-emerald-700 text-[10px] font-bold px-1.5 py-0.2 rounded-full">5문항</span>
+      </button>
+      <button class="nav-tab px-3.5 py-1.5 rounded-lg text-slate-600 hover:text-indigo-600 hover:bg-indigo-50/70 transition flex items-center gap-2 whitespace-nowrap" data-target="tab-calc">
+        <i class="fa-solid fa-calculator text-xs"></i> 4. 산출 계산기
+      </button>
+      <button class="nav-tab px-3.5 py-1.5 rounded-lg text-slate-600 hover:text-indigo-600 hover:bg-indigo-50/70 transition flex items-center gap-2 whitespace-nowrap" data-target="tab-table">
+        <i class="fa-solid fa-table-list text-xs"></i> 5. 핵심 암기표
+      </button>
+    </div>
+  </header>
+
+  <main class="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 py-6">
+
+    <!-- ========================================== -->
+    <!-- TAB 1: 핵심 요약 (Summary) -->
+    <!-- ========================================== -->
+    <section id="tab-summary" class="tab-pane block space-y-6">
+      <!-- Hero Banner -->
+      <div class="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white rounded-2xl p-6 sm:p-8 shadow-xl relative overflow-hidden">
+        <div class="absolute right-0 top-0 bottom-0 w-1/3 bg-radial from-indigo-500/20 to-transparent pointer-events-none"></div>
+        <div class="max-w-2xl relative z-10">
+          <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold bg-indigo-500/30 text-indigo-200 border border-indigo-400/30 mb-3">
+            <i class="fa-solid fa-graduation-cap"></i> 철근 지식 저장소 공학교육 분석
+          </span>
+          <h2 class="text-2xl sm:text-3xl font-black tracking-tight leading-tight mb-2">
+            창호 및 유리공사 수량 산출 완벽 마스터
+          </h2>
+          <p class="text-sm text-slate-300 leading-relaxed">
+            도면 일람표 기호 판독부터 개구부 사춤(모르타르 충전), 외측 코킹, 유리 면적 보정계수 및 2짝 미서기창 코킹 양면 산출식까지 실무 핵심 논리를 한눈에 파악하세요.
+          </p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <!-- 단락 1 -->
+        <div class="bg-white rounded-2xl p-6 border border-slate-200/90 shadow-sm hover:shadow-md transition">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-9 h-9 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center font-bold text-sm">
+              01
+            </div>
+            <h3 class="font-bold text-base text-slate-900">창호일람표 판독 및 기호 체계</h3>
+          </div>
+          <div class="space-y-2.5 text-sm text-slate-600 leading-relaxed">
+            <div class="p-3 bg-slate-50 rounded-xl border border-slate-100 flex items-start gap-2.5">
+              <i class="fa-solid fa-circle-info text-blue-500 mt-1 text-xs"></i>
+              <span><strong>창호 기호 구성:</strong> 원형 기호를 상하로 2분할하여 <strong class="text-indigo-600">상부=일련번호</strong>, <strong class="text-indigo-600">하부=재질 + 용도</strong> 기호 표기.</span>
+            </div>
+            <p>• <strong>울거미 재질(앞 글자):</strong> P(합성수지/플라스틱), A(알루미늄 합금), S(강철), SUS(스테인리스), W(목재)</p>
+            <p>• <strong>용도(뒷 글자):</strong> W(창문), D(출입문), FSD/FD(방화문), S(셔터)</p>
+            <p class="text-xs bg-indigo-50/70 p-2 rounded-lg text-indigo-900">💡 <strong>PW</strong> = 합성수지제 창문 / <strong>PD</strong> = 합성수지제 출입문</p>
+          </div>
+        </div>
+
+        <!-- 단락 2 -->
+        <div class="bg-white rounded-2xl p-6 border border-slate-200/90 shadow-sm hover:shadow-md transition">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-9 h-9 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold text-sm">
+              02
+            </div>
+            <h3 class="font-bold text-base text-slate-900">창호 부속철물 및 주요 산출 항목</h3>
+          </div>
+          <div class="space-y-2.5 text-sm text-slate-600 leading-relaxed">
+            <p>• <strong>핵심 하드웨어:</strong> 미서기창 잠금쇠 <strong>크리센트(Crescent)</strong>, 여닫이 닫힘 제어용 <strong>도어 체크(Door Closer)</strong>, 충돌 방지 <strong>도어 스톱(Door Stop)</strong>.</p>
+            <p>• <strong>개구부 시공 오차:</strong> 콘크리트 타설 시 측압에 의한 거푸집 배부름을 고려하여 도면보다 개구부를 여유 있게 시공함.</p>
+            <div class="p-3 bg-emerald-50 rounded-xl border border-emerald-100 text-emerald-950 font-medium">
+              ✓ 창호 3대 산출: ① 제작·설치(도장/철물 포함 일괄) ② 창호 주위 모르타르 사춤 ③ 창호 주위 코킹
+            </div>
+          </div>
+        </div>
+
+        <!-- 단락 3 -->
+        <div class="bg-white rounded-2xl p-6 border border-slate-200/90 shadow-sm hover:shadow-md transition">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-9 h-9 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center font-bold text-sm">
+              03
+            </div>
+            <h3 class="font-bold text-base text-slate-900">창호 실무 수량 산출 로직</h3>
+          </div>
+          <div class="space-y-3 text-sm text-slate-600 leading-relaxed">
+            <div class="bg-amber-50/80 p-3 rounded-xl border border-amber-200/60">
+              <div class="font-bold text-amber-900 text-xs mb-1">📐 모르타르 충전(사춤) 기준</div>
+              <ul class="list-disc list-inside space-y-1 text-xs text-amber-800">
+                <li><strong>일반 창문(4면):</strong> $2 \times (\text{폭} + \text{높이}) \times \text{개소}$</li>
+                <li><strong>출입문(바닥 제외 3면):</strong> $(\text{폭} + 2 \times \text{높이}) \times \text{개소}$</li>
+              </ul>
+            </div>
+            <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
+              <div class="font-bold text-slate-900 text-xs mb-1">💧 창호 주위 코킹 (실링재)</div>
+              <p class="text-xs">외기에 면한 창호는 방수를 위해 <strong>외측 1면 전장</strong> 코킹을 산출하며, 실내 간벽 창호는 제외합니다.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 단락 4 & 5 (Combined Glass Section) -->
+        <div class="bg-white rounded-2xl p-6 border border-slate-200/90 shadow-sm hover:shadow-md transition">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-9 h-9 rounded-xl bg-violet-100 text-violet-700 flex items-center justify-center font-bold text-sm">
+              04 & 05
+            </div>
+            <h3 class="font-bold text-base text-slate-900">유리공사 시공 순서 및 약식 산출 공식</h3>
+          </div>
+          <div class="space-y-2.5 text-sm text-slate-600 leading-relaxed">
+            <p>• <strong>설치 순서:</strong> 프레임 설치 $\rightarrow$ <strong>세팅 블록(Setting Block)</strong> 하부 거치 $\rightarrow$ 유리 끼움 $\rightarrow$ 누름대(비드) 고정 $\rightarrow$ 실링재(코킹) 양면 충전</p>
+            <div class="p-3 bg-violet-50 rounded-xl border border-violet-100 text-xs space-y-1.5 text-violet-900">
+              <p>• <strong>유리 면적:</strong> $(W \times H) \times (0.9 \sim 0.95) \times \text{개소}$ (프레임 공제 계수)</p>
+              <p>• <strong>2짝 미서기창 코킹:</strong> $\{(2 \times W) + (4 \times H)\} \times 0.9 \times 2(\text{양면}) \times \text{개소}$</p>
+              <p class="text-[11px] text-violet-700">※ 창짝 2개가 겹쳐 수직선이 총 4개(좌, 우, 중앙 겹침 2변) 발생함에 유의!</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- TAB 2: 플래시카드 (Flashcards) -->
+    <!-- ========================================== -->
+    <section id="tab-flashcard" class="tab-pane hidden space-y-6">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-4 sm:p-5 rounded-2xl border border-slate-200">
+        <div>
+          <h2 class="font-bold text-lg text-slate-900 flex items-center gap-2">
+            <i class="fa-solid fa-layer-group text-indigo-600"></i>
+            10대 핵심 플래시카드 (Round 1)
+          </h2>
+          <p class="text-xs text-slate-500">카드를 클릭하거나 터치하여 뒷면의 정답 및 해설을 확인하세요.</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <span id="flashcardCounter" class="text-xs font-bold px-3 py-1 bg-indigo-50 text-indigo-700 rounded-full border border-indigo-200">1 / 10</span>
+          <button id="resetMasteredBtn" class="text-xs font-medium text-slate-500 hover:text-slate-800 px-2.5 py-1 rounded-md hover:bg-slate-100 transition">
+            <i class="fa-solid fa-rotate-right mr-1"></i>암기 상태 초기화
+          </button>
+        </div>
+      </div>
+
+      <!-- Flashcard Interactive Stage -->
+      <div class="flex flex-col items-center">
+        <!-- 3D Card Container -->
+        <div class="w-full max-w-xl h-80 sm:h-96 perspective cursor-pointer" id="flashcardBox">
+          <div id="cardInner" class="relative w-full h-full duration-500 transform-style-preserve-3d transition-transform rounded-3xl shadow-xl">
+            <!-- Front Face -->
+            <div class="absolute w-full h-full backface-hidden bg-gradient-to-br from-white via-slate-50 to-indigo-50/40 border-2 border-indigo-100 rounded-3xl p-7 sm:p-9 flex flex-col justify-between">
+              <div class="flex justify-between items-center text-xs font-semibold text-slate-400">
+                <span id="cardCategory" class="px-2.5 py-1 rounded-lg bg-indigo-100/70 text-indigo-800">창호 기호 및 표기</span>
+                <span class="flex items-center gap-1 text-slate-400"><i class="fa-solid fa-hand-pointer animate-pulse"></i> 탭하여 뒤집기</span>
+              </div>
+              <div class="text-center my-auto px-2">
+                <span class="text-xs font-bold text-indigo-500 uppercase tracking-widest block mb-2">[ 앞면 : 질문 & 핵심 개념 ]</span>
+                <h3 id="cardFrontText" class="text-lg sm:text-2xl font-black text-slate-800 leading-snug">
+                  창호 기호 표기에서 상부와 하부의 의미
+                </h3>
+              </div>
+              <div class="text-center text-xs text-slate-400">
+                카드를 탭하면 명쾌한 실무 정의가 나타납니다.
+              </div>
+            </div>
+
+            <!-- Back Face -->
+            <div class="absolute w-full h-full backface-hidden rotate-y-180 bg-gradient-to-br from-indigo-900 via-indigo-950 to-slate-900 border-2 border-indigo-500/40 rounded-3xl p-7 sm:p-9 text-white flex flex-col justify-between shadow-2xl">
+              <div class="flex justify-between items-center text-xs font-semibold text-indigo-200">
+                <span class="px-2.5 py-1 rounded-lg bg-indigo-800/80 text-indigo-200">정답 및 실무 해설</span>
+                <span class="text-indigo-300"><i class="fa-solid fa-check-double mr-1"></i>정답 확인</span>
+              </div>
+              <div class="text-center my-auto px-2">
+                <span class="text-xs font-bold text-emerald-400 uppercase tracking-widest block mb-2">[ 뒷면 : 정답 & 해설 ]</span>
+                <p id="cardBackText" class="text-base sm:text-xl font-bold text-indigo-50 leading-relaxed">
+                  상부는 구분 일련번호, 하부는 창호 재질 및 용도를 나타내는 알파벳 기호
+                </p>
+              </div>
+              <div class="text-center text-xs text-indigo-300">
+                다시 탭하면 질문 화면으로 돌아갑니다.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Navigation Controls -->
+        <div class="w-full max-w-xl mt-6 flex items-center justify-between gap-3 px-2">
+          <button id="prevCardBtn" class="flex-1 py-3 px-4 bg-white hover:bg-slate-100 text-slate-700 font-bold rounded-xl border border-slate-200 shadow-sm transition flex items-center justify-center gap-2">
+            <i class="fa-solid fa-arrow-left"></i> 이전 카드
+          </button>
+          <button id="markMasteredBtn" class="py-3 px-4 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold rounded-xl border border-emerald-200 transition flex items-center gap-1.5 whitespace-nowrap text-xs sm:text-sm">
+            <i class="fa-solid fa-check"></i> <span id="masteredBtnText">외웠어요</span>
+          </button>
+          <button id="nextCardBtn" class="flex-1 py-3 px-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-md shadow-indigo-200 transition flex items-center justify-center gap-2">
+            다음 카드 <i class="fa-solid fa-arrow-right"></i>
+          </button>
+        </div>
+
+        <!-- Progress dots -->
+        <div id="flashcardDots" class="flex items-center gap-1.5 mt-5">
+          <!-- Dots will be generated dynamically -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- TAB 3: 이해도 점검 퀴즈 (Quiz) -->
+    <!-- ========================================== -->
+    <section id="tab-quiz" class="tab-pane hidden space-y-6">
+      <div class="bg-white p-5 rounded-2xl border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h2 class="font-bold text-lg text-slate-900 flex items-center gap-2">
+            <i class="fa-solid fa-circle-question text-emerald-600"></i>
+            강의 이해도 점검 실전 퀴즈 (5문항)
+          </h2>
+          <p class="text-xs text-slate-500">객관식 3문항과 단답 및 주관 산출 2문항으로 실무 적산 능력을 점검하세요.</p>
+        </div>
+        <div class="flex items-center gap-3">
+          <div id="quizScoreBadge" class="text-xs font-extrabold px-3 py-1.5 bg-slate-100 text-slate-700 rounded-xl border border-slate-200">
+            점수: 대기 중
+          </div>
+          <button id="resetQuizBtn" class="px-3 py-1.5 text-xs font-semibold bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-xl transition">
+            <i class="fa-solid fa-rotate-left mr-1"></i>다시 풀기
+          </button>
+        </div>
+      </div>
+
+      <!-- Quiz Form Container -->
+      <div id="quizContainer" class="space-y-5">
+        <!-- Question 1 -->
+        <div class="quiz-card bg-white p-6 rounded-2xl border border-slate-200 shadow-sm" data-qid="1">
+          <div class="flex items-start justify-between gap-2 mb-3">
+            <span class="text-xs font-bold px-2 py-0.5 rounded bg-blue-100 text-blue-800">문제 01 (객관식)</span>
+            <span class="status-indicator text-xs font-semibold hidden"></span>
+          </div>
+          <h4 class="font-bold text-slate-900 text-base mb-4 leading-snug">
+            1. 창호 기호 표기 및 분류에 대한 설명 중 가장 옳지 <u>않은</u> 것은?
+          </h4>
+          <div class="space-y-2">
+            <label class="quiz-option flex items-center p-3 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer transition">
+              <input type="radio" name="q1" value="1" class="text-indigo-600 focus:ring-indigo-500">
+              <span class="ml-3 text-sm text-slate-700">① 창호 기호의 원형 표기에서 위쪽에는 일련번호를, 아래쪽에는 재질과 용도 약어를 표기한다.</span>
+            </label>
+            <label class="quiz-option flex items-center p-3 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer transition">
+              <input type="radio" name="q1" value="2" class="text-indigo-600 focus:ring-indigo-500">
+              <span class="ml-3 text-sm text-slate-700">② 울거미 재질 기호에서 'P'는 합성수지(플라스틱), 'A'는 알루미늄을 의미한다.</span>
+            </label>
+            <label class="quiz-option flex items-center p-3 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer transition">
+              <input type="radio" name="q1" value="3" class="text-indigo-600 focus:ring-indigo-500">
+              <span class="ml-3 text-sm text-slate-700">③ 'PW'는 목재(Wood) 프레임으로 제작된 창문을 의미한다.</span>
+            </label>
+            <label class="quiz-option flex items-center p-3 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer transition">
+              <input type="radio" name="q1" value="4" class="text-indigo-600 focus:ring-indigo-500">
+              <span class="ml-3 text-sm text-slate-700">④ 문의 용도 표기 기호로는 Door의 약자인 'D'를 주로 사용한다.</span>
+            </label>
+          </div>
+          <div class="feedback hidden mt-4 p-3.5 rounded-xl text-xs leading-relaxed"></div>
+        </div>
+
+        <!-- Question 2 -->
+        <div class="quiz-card bg-white p-6 rounded-2xl border border-slate-200 shadow-sm" data-qid="2">
+          <div class="flex items-start justify-between gap-2 mb-3">
+            <span class="text-xs font-bold px-2 py-0.5 rounded bg-blue-100 text-blue-800">문제 02 (객관식)</span>
+            <span class="status-indicator text-xs font-semibold hidden"></span>
+          </div>
+          <h4 class="font-bold text-slate-900 text-base mb-4 leading-snug">
+            2. 창호공사의 수량 산출 및 시공 기준에 대한 설명으로 옳은 것은?
+          </h4>
+          <div class="space-y-2">
+            <label class="quiz-option flex items-center p-3 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer transition">
+              <input type="radio" name="q2" value="1" class="text-indigo-600 focus:ring-indigo-500">
+              <span class="ml-3 text-sm text-slate-700">① 문의 창호 주위 모르타르 사춤 수량은 창문과 동일하게 외곽 4면 전체를 산출한다.</span>
+            </label>
+            <label class="quiz-option flex items-center p-3 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer transition">
+              <input type="radio" name="q2" value="2" class="text-indigo-600 focus:ring-indigo-500">
+              <span class="ml-3 text-sm text-slate-700">② 창호 제작·설치비는 일반적으로 부속 철물과 보양 비용을 포함하여 개소당 외주 단가로 산출한다.</span>
+            </label>
+            <label class="quiz-option flex items-center p-3 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer transition">
+              <input type="radio" name="q2" value="3" class="text-indigo-600 focus:ring-indigo-500">
+              <span class="ml-3 text-sm text-slate-700">③ 실내 벽체에 설치되는 모든 내부 문도 외기 차단을 위해 외곽 둘레 코킹을 반드시 산출해야 한다.</span>
+            </label>
+            <label class="quiz-option flex items-center p-3 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer transition">
+              <input type="radio" name="q2" value="4" class="text-indigo-600 focus:ring-indigo-500">
+              <span class="ml-3 text-sm text-slate-700">④ 개구부는 콘크리트 타설 압력을 감안하여 도면 치수보다 작게 타설하는 것이 원칙이다.</span>
+            </label>
+          </div>
+          <div class="feedback hidden mt-4 p-3.5 rounded-xl text-xs leading-relaxed"></div>
+        </div>
+
+        <!-- Question 3 -->
+        <div class="quiz-card bg-white p-6 rounded-2xl border border-slate-200 shadow-sm" data-qid="3">
+          <div class="flex items-start justify-between gap-2 mb-3">
+            <span class="text-xs font-bold px-2 py-0.5 rounded bg-blue-100 text-blue-800">문제 03 (객관식)</span>
+            <span class="status-indicator text-xs font-semibold hidden"></span>
+          </div>
+          <h4 class="font-bold text-slate-900 text-base mb-4 leading-snug">
+            3. 유리공사 시공 및 면적 산출에 관한 내용 중 올바른 설명은?
+          </h4>
+          <div class="space-y-2">
+            <label class="quiz-option flex items-center p-3 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer transition">
+              <input type="radio" name="q3" value="1" class="text-indigo-600 focus:ring-indigo-500">
+              <span class="ml-3 text-sm text-slate-700">① 세팅 블록은 유리를 끼운 뒤 유리가 움직이지 않도록 상부 틈새에 끼워 넣는 부재이다.</span>
+            </label>
+            <label class="quiz-option flex items-center p-3 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer transition">
+              <input type="radio" name="q3" value="2" class="text-indigo-600 focus:ring-indigo-500">
+              <span class="ml-3 text-sm text-slate-700">② 로이(Low-E) 유리는 외부 가시광선을 100% 차단하기 위해 암막 코팅을 적용한 유리이다.</span>
+            </label>
+            <label class="quiz-option flex items-center p-3 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer transition">
+              <input type="radio" name="q3" value="3" class="text-indigo-600 focus:ring-indigo-500">
+              <span class="ml-3 text-sm text-slate-700">③ 실무에서는 도면 작성 편의상 창호 외곽 면적에 프레임 공제율(0.9 ~ 0.95)을 곱해 유리 면적을 약식 산출한다.</span>
+            </label>
+            <label class="quiz-option flex items-center p-3 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer transition">
+              <input type="radio" name="q3" value="4" class="text-indigo-600 focus:ring-indigo-500">
+              <span class="ml-3 text-sm text-slate-700">④ 유리 주위 실링재(코킹)는 시각적 노출 부위인 실외 측 1면에만 시공하고 수량을 산출한다.</span>
+            </label>
+          </div>
+          <div class="feedback hidden mt-4 p-3.5 rounded-xl text-xs leading-relaxed"></div>
+        </div>
+
+        <!-- Question 4 -->
+        <div class="quiz-card bg-white p-6 rounded-2xl border border-slate-200 shadow-sm" data-qid="4">
+          <div class="flex items-start justify-between gap-2 mb-3">
+            <span class="text-xs font-bold px-2 py-0.5 rounded bg-purple-100 text-purple-800">문제 04 (계산형 단답)</span>
+            <span class="status-indicator text-xs font-semibold hidden"></span>
+          </div>
+          <h4 class="font-bold text-slate-900 text-base mb-2 leading-snug">
+            4. 폭 1.0 m, 높이 2.0 m인 실내 여닫이문(PD) 3개소를 시공할 때, '창호 주위 모르타르 충전(사춤)'의 총 산출 길이(m)는 얼마인가?
+          </h4>
+          <p class="text-xs text-slate-500 mb-3">(단, 바닥면은 제외하며 숫자만 입력하세요. 예: 15.0)</p>
+          <div class="flex items-center gap-3">
+            <input type="number" step="0.1" id="q4Input" placeholder="계산값 입력 (m)" class="w-48 px-3.5 py-2 text-sm rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+            <span class="text-sm font-semibold text-slate-600">m</span>
+          </div>
+          <div class="feedback hidden mt-4 p-3.5 rounded-xl text-xs leading-relaxed"></div>
+        </div>
+
+        <!-- Question 5 -->
+        <div class="quiz-card bg-white p-6 rounded-2xl border border-slate-200 shadow-sm" data-qid="5">
+          <div class="flex items-start justify-between gap-2 mb-3">
+            <span class="text-xs font-bold px-2 py-0.5 rounded bg-purple-100 text-purple-800">문제 05 (서술·계산형)</span>
+            <span class="status-indicator text-xs font-semibold hidden"></span>
+          </div>
+          <h4 class="font-bold text-slate-900 text-base mb-2 leading-snug">
+            5. 폭 1.2 m, 높이 0.8 m인 2짝 미서기창(PW) 1개소에 공제계수 0.9 적용 시, 양면 '유리 주위 코킹' 총 길이(m)를 계산하시오.
+          </h4>
+          <p class="text-xs text-slate-500 mb-3">(공식: [2W + 4H] × 0.9 × 2 / 소수점 둘째 자리까지 숫자 입력)</p>
+          <div class="flex items-center gap-3">
+            <input type="number" step="0.01" id="q5Input" placeholder="계산값 입력 (m)" class="w-48 px-3.5 py-2 text-sm rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+            <span class="text-sm font-semibold text-slate-600">m</span>
+          </div>
+          <div class="feedback hidden mt-4 p-3.5 rounded-xl text-xs leading-relaxed"></div>
+        </div>
+      </div>
+
+      <div class="flex justify-end pt-2">
+        <button id="submitQuizBtn" class="px-6 py-3 bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 text-white font-extrabold rounded-xl shadow-md transition flex items-center gap-2">
+          <i class="fa-solid fa-square-check"></i> 답안 채점 및 정답·해설 확인
+        </button>
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- TAB 4: 실무 수량 산출 계산기 (Calculator) -->
+    <!-- ========================================== -->
+    <section id="tab-calc" class="tab-pane hidden space-y-6">
+      <div class="bg-white p-5 rounded-2xl border border-slate-200">
+        <h2 class="font-bold text-lg text-slate-900 flex items-center gap-2 mb-1">
+          <i class="fa-solid fa-calculator text-indigo-600"></i>
+          창호 및 유리 실무 수량 산출 시뮬레이터
+        </h2>
+        <p class="text-xs text-slate-500">도면 치수(폭, 높이, 수량)와 조건을 입력하면 사춤·코킹·유리면적을 즉시 공학적으로 산출합니다.</p>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <!-- Input Form Section (5 cols) -->
+        <div class="lg:col-span-5 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-5">
+          <div class="border-b border-slate-100 pb-3 flex items-center justify-between">
+            <h3 class="font-bold text-sm text-slate-800">
+              <i class="fa-solid fa-sliders text-indigo-500 mr-1.5"></i>입력 변수 설정
+            </h3>
+            <button id="loadPresetBtn" class="text-xs text-indigo-600 hover:text-indigo-800 font-semibold">
+              <i class="fa-solid fa-wand-magic-sparkles mr-1"></i>강의 예제(PW02) 불러오기
+            </button>
+          </div>
+
+          <!-- Type Selector -->
+          <div>
+            <label class="block text-xs font-bold text-slate-600 mb-1.5">창호 유형 구분</label>
+            <div class="grid grid-cols-2 gap-2">
+              <button type="button" id="typeWindowBtn" class="calc-type-btn py-2.5 px-3 rounded-xl border-2 border-indigo-600 bg-indigo-50/50 text-indigo-700 font-bold text-xs flex items-center justify-center gap-1.5 transition">
+                <i class="fa-solid fa-window-maximize"></i> 창문 (Window / 4면)
+              </button>
+              <button type="button" id="typeDoorBtn" class="calc-type-btn py-2.5 px-3 rounded-xl border border-slate-200 bg-white text-slate-600 font-semibold text-xs flex items-center justify-center gap-1.5 transition">
+                <i class="fa-solid fa-door-open"></i> 출입문 (Door / 3면)
+              </button>
+            </div>
+          </div>
+
+          <!-- Dimensions -->
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-semibold text-slate-600 mb-1">폭 (W, Width)</label>
+              <div class="relative">
+                <input type="number" id="calcW" value="1.2" step="0.05" class="w-full px-3 py-2 text-sm rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:outline-none font-semibold">
+                <span class="absolute right-3 top-2.5 text-xs text-slate-400">m</span>
+              </div>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-600 mb-1">높이 (H, Height)</label>
+              <div class="relative">
+                <input type="number" id="calcH" value="0.8" step="0.05" class="w-full px-3 py-2 text-sm rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:outline-none font-semibold">
+                <span class="absolute right-3 top-2.5 text-xs text-slate-400">m</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quantity & Factor -->
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-semibold text-slate-600 mb-1">시공 개소 (수량)</label>
+              <div class="relative">
+                <input type="number" id="calcQty" value="2" min="1" step="1" class="w-full px-3 py-2 text-sm rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:outline-none font-semibold">
+                <span class="absolute right-3 top-2.5 text-xs text-slate-400">개소</span>
+              </div>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-600 mb-1">프레임 공제 계수</label>
+              <select id="calcFactor" class="w-full px-3 py-2 text-sm rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-white font-medium">
+                <option value="0.9" selected>0.90 (일반 실무 표준)</option>
+                <option value="0.95">0.95 (대형 슬림 프레임)</option>
+                <option value="1.0">1.00 (공제 없음)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Additional Options -->
+          <div class="space-y-2 pt-2 border-t border-slate-100">
+            <label class="flex items-center gap-2 cursor-pointer text-xs text-slate-700">
+              <input type="checkbox" id="calcExterior" checked class="rounded text-indigo-600 focus:ring-indigo-500">
+              <span class="font-medium">외기에 직접 면함 (외부 1면 둘레 코킹 산출 적용)</span>
+            </label>
+            <label class="flex items-center gap-2 cursor-pointer text-xs text-slate-700">
+              <input type="checkbox" id="calcTwoSash" checked class="rounded text-indigo-600 focus:ring-indigo-500">
+              <span class="font-medium">2짝 미서기창 구조 (유리 수직선 4변 적용)</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Real-time Output & Diagram (7 cols) -->
+        <div class="lg:col-span-7 space-y-4">
+          <!-- Visual Preview Box -->
+          <div class="bg-gradient-to-br from-slate-900 to-indigo-950 text-white p-5 rounded-2xl shadow-md border border-slate-800 flex flex-col justify-between">
+            <div class="flex items-center justify-between mb-3">
+              <span class="text-xs font-bold text-indigo-300 flex items-center gap-1.5">
+                <i class="fa-solid fa-vector-square"></i> 산출 모델 구조 다이어그램
+              </span>
+              <span id="calcBadgeType" class="text-[11px] px-2 py-0.5 rounded bg-indigo-500/30 text-indigo-200 border border-indigo-400/30">
+                창문 4면 적용
+              </span>
+            </div>
+
+            <!-- Scaled Interactive SVG Frame Preview -->
+            <div class="w-full h-44 bg-slate-950/60 rounded-xl border border-slate-800 flex items-center justify-center p-3 relative overflow-hidden">
+              <svg id="calcSvg" class="max-w-full max-h-full drop-shadow-lg" viewBox="0 0 240 160">
+                <!-- Frame Exterior (Yellow/Orange: Mortar Mortise) -->
+                <rect x="20" y="15" width="200" height="130" fill="none" stroke="#f59e0b" stroke-width="5" stroke-dasharray="6 3" rx="2" />
+                <!-- Window Frame Sashes (Indigo) -->
+                <rect x="25" y="20" width="98" height="120" fill="rgba(99, 102, 241, 0.25)" stroke="#818cf8" stroke-width="3" rx="1" />
+                <rect x="117" y="20" width="98" height="120" fill="rgba(99, 102, 241, 0.25)" stroke="#818cf8" stroke-width="3" rx="1" />
+                <!-- Glass Panes (Cyan) -->
+                <rect x="33" y="28" width="82" height="104" fill="rgba(56, 189, 248, 0.3)" stroke="#38bdf8" stroke-width="1.5" />
+                <rect x="125" y="28" width="82" height="104" fill="rgba(56, 189, 248, 0.3)" stroke="#38bdf8" stroke-width="1.5" />
+                <!-- Labels -->
+                <text x="120" y="12" fill="#94a3b8" font-size="9" text-anchor="middle" font-weight="bold">폭 W</text>
+                <text x="12" y="85" fill="#94a3b8" font-size="9" text-anchor="middle" font-weight="bold" transform="rotate(-90 12,85)">높이 H</text>
+              </svg>
+            </div>
+            <div class="flex items-center justify-between text-[11px] text-slate-400 mt-2 px-1">
+              <span>🟨 황색 점선: 사춤/외측코킹</span>
+              <span>🟦 하늘색: 유리 면적 & 내외 양면 코킹선</span>
+            </div>
+          </div>
+
+          <!-- Calculated Results Cards -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <!-- 사춤 길이 -->
+            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+              <span class="text-[11px] font-bold text-slate-400 block mb-1">모르타르 사춤 길이</span>
+              <div class="text-xl sm:text-2xl font-black text-slate-900" id="resMortar">8.00 <span class="text-xs font-semibold text-slate-500">m</span></div>
+              <p class="text-[10px] text-slate-400 mt-1" id="resMortarFormula">2 × (1.2 + 0.8) × 2개소</p>
+            </div>
+
+            <!-- 외측 코킹 -->
+            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+              <span class="text-[11px] font-bold text-slate-400 block mb-1">창호 외측 코킹</span>
+              <div class="text-xl sm:text-2xl font-black text-indigo-600" id="resExtCaulk">8.00 <span class="text-xs font-semibold text-slate-500">m</span></div>
+              <p class="text-[10px] text-slate-400 mt-1" id="resExtCaulkFormula">외기 면함 (외측 1면 전장)</p>
+            </div>
+
+            <!-- 유리 면적 -->
+            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+              <span class="text-[11px] font-bold text-slate-400 block mb-1">유리 정미 면적 (약식)</span>
+              <div class="text-xl sm:text-2xl font-black text-emerald-600" id="resGlassArea">1.728 <span class="text-xs font-semibold text-slate-500">m²</span></div>
+              <p class="text-[10px] text-slate-400 mt-1" id="resGlassAreaFormula">(1.2 × 0.8 × 0.9) × 2</p>
+            </div>
+          </div>
+
+          <!-- 유리 코킹 상세 카드 -->
+          <div class="bg-indigo-50/70 p-4 rounded-xl border border-indigo-200/80 flex items-center justify-between">
+            <div>
+              <span class="text-xs font-bold text-indigo-950 block">유리 주위 실링재 (코킹 길이, 양면 시공)</span>
+              <p class="text-xs text-indigo-800 mt-0.5" id="resGlassCaulkFormula">
+                {(2 × 1.2) + (4 × 0.8)} × 0.9 × 2(양면) × 2개소
+              </p>
+            </div>
+            <div class="text-right">
+              <span class="text-2xl font-black text-indigo-700" id="resGlassCaulk">20.16</span>
+              <span class="text-xs font-bold text-indigo-600">m</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- TAB 5: 핵심 암기표 (Table) -->
+    <!-- ========================================== -->
+    <section id="tab-table" class="tab-pane hidden space-y-6">
+      <div class="bg-white p-5 rounded-2xl border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div>
+          <h2 class="font-bold text-lg text-slate-900 flex items-center gap-2">
+            <i class="fa-solid fa-table-list text-indigo-600"></i>
+            한눈에 보는 핵심 암기 & 실무 적산 기준표
+          </h2>
+          <p class="text-xs text-slate-500">시험 직전 빠른 복습 및 견적 실무 확인용 총괄 요약표입니다.</p>
+        </div>
+        <!-- Search filter -->
+        <div class="relative w-full sm:w-64">
+          <input type="text" id="tableSearch" placeholder="키워드 검색 (예: 코킹, 사춤, 0.9)" class="w-full pl-9 pr-3 py-1.5 text-xs rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+          <i class="fa-solid fa-magnifying-glass text-slate-400 absolute left-3 top-2.5 text-xs"></i>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse text-sm" id="cheatSheetTable">
+            <thead>
+              <tr class="bg-slate-100/80 text-slate-700 font-bold text-xs uppercase tracking-wider border-b border-slate-200">
+                <th class="py-3 px-4 w-1/4">구분 / 핵심 키워드</th>
+                <th class="py-3 px-4 w-2/5">세부 내용 및 산출 기준 공식</th>
+                <th class="py-3 px-4 w-1/3">주의사항 및 실무 팁</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100 text-slate-600">
+              <tr class="hover:bg-indigo-50/30 transition">
+                <td class="py-3.5 px-4 font-bold text-slate-900">
+                  <span class="inline-block px-2 py-0.5 rounded bg-blue-50 text-blue-700 text-xs mr-1">기호</span>
+                  창호 기호 표기법
+                </td>
+                <td class="py-3.5 px-4 text-xs space-y-1">
+                  <p>• <strong>상부:</strong> 일련번호 (01, 02 등)</p>
+                  <p>• <strong>하부 앞:</strong> 재질 (P: 플라스틱, A: 알루미늄, S: 스틸, W: 목재)</p>
+                  <p>• <strong>하부 뒤:</strong> 용도 (W: 창, D: 문, FD: 방화문, S: 셔터)</p>
+                </td>
+                <td class="py-3.5 px-4 text-xs text-slate-500">
+                  재질과 용도의 알파벳 순서 혼동 방지 (PW: 합성수지제 창문).
+                </td>
+              </tr>
+
+              <tr class="hover:bg-indigo-50/30 transition">
+                <td class="py-3.5 px-4 font-bold text-slate-900">
+                  <span class="inline-block px-2 py-0.5 rounded bg-amber-50 text-amber-700 text-xs mr-1">사춤</span>
+                  창호 모르타르 충전
+                </td>
+                <td class="py-3.5 px-4 text-xs space-y-1">
+                  <p>• <strong>창문:</strong> 둘레 4면 전장 $\{2 \times (W+H)\} \times \text{개소}$</p>
+                  <p>• <strong>출입문:</strong> 바닥 제외 3면 $\{W + (2 \times H)\} \times \text{개소}$</p>
+                </td>
+                <td class="py-3.5 px-4 text-xs text-slate-500">
+                  문 하부는 바닥 미장과 동시 타설되므로 산출 제외. 미장공사 항목과 중복 계상 여부 확인 필수.
+                </td>
+              </tr>
+
+              <tr class="hover:bg-indigo-50/30 transition">
+                <td class="py-3.5 px-4 font-bold text-slate-900">
+                  <span class="inline-block px-2 py-0.5 rounded bg-indigo-50 text-indigo-700 text-xs mr-1">방수</span>
+                  창호 주위 코킹
+                </td>
+                <td class="py-3.5 px-4 text-xs">
+                  외기에 직접 면하는 창호 외부 둘레 1면에 실링재 도포 산출 $\{2 \times (W+H)\}$
+                </td>
+                <td class="py-3.5 px-4 text-xs text-slate-500">
+                  실내 간벽에 면한 창호는 코킹을 산출하지 않음.
+                </td>
+              </tr>
+
+              <tr class="hover:bg-indigo-50/30 transition">
+                <td class="py-3.5 px-4 font-bold text-slate-900">
+                  <span class="inline-block px-2 py-0.5 rounded bg-purple-50 text-purple-700 text-xs mr-1">자재</span>
+                  세팅 블록 (Setting Block)
+                </td>
+                <td class="py-3.5 px-4 text-xs">
+                  유리 하단부와 창틀 프레임 사이에 배치하는 완충 블록
+                </td>
+                <td class="py-3.5 px-4 text-xs text-slate-500">
+                  유리 자중에 의한 처짐 방지, 프레임과의 직접 충돌 완화 및 배수 유로 확보 목적.
+                </td>
+              </tr>
+
+              <tr class="hover:bg-indigo-50/30 transition">
+                <td class="py-3.5 px-4 font-bold text-slate-900">
+                  <span class="inline-block px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 text-xs mr-1">면적</span>
+                  유리 면적 약식 산출
+                </td>
+                <td class="py-3.5 px-4 text-xs">
+                  $(W \times H) \times (0.9 \sim 0.95) \times \text{개소}$
+                </td>
+                <td class="py-3.5 px-4 text-xs text-slate-500">
+                  유리 정미 치수 일람표 미제공 시 프레임 공제 계수 $0.9 \sim 0.95$를 곱해 간소화 산출.
+                </td>
+              </tr>
+
+              <tr class="hover:bg-indigo-50/30 transition">
+                <td class="py-3.5 px-4 font-bold text-slate-900">
+                  <span class="inline-block px-2 py-0.5 rounded bg-cyan-50 text-cyan-700 text-xs mr-1">코킹</span>
+                  유리 주위 코킹 (2짝 미서기)
+                </td>
+                <td class="py-3.5 px-4 text-xs">
+                  $\{(2 \times W) + (4 \times H)\} \times 0.9 \times 2(\text{양면}) \times \text{개소}$
+                </td>
+                <td class="py-3.5 px-4 text-xs text-slate-500">
+                  창짝 2개의 겹침으로 수직 프레임이 총 4변 발생하며, 반드시 실내외 양면($\times 2$) 도포 적용.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Toast Notification Box (Never use native alert) -->
+  <div id="toastBox" class="fixed bottom-6 right-6 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
+    <div class="bg-slate-900 text-white px-4 py-3 rounded-2xl shadow-xl flex items-center gap-3 border border-slate-700 max-w-sm">
+      <div id="toastIcon" class="w-7 h-7 rounded-lg bg-indigo-600 flex items-center justify-center text-xs">
+        <i class="fa-solid fa-bell"></i>
+      </div>
+      <div class="text-xs">
+        <p id="toastTitle" class="font-bold text-slate-100">알림</p>
+        <p id="toastMessage" class="text-slate-300">메시지 내용입니다.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="mt-auto border-t border-slate-200 bg-white/80 py-6 text-center text-xs text-slate-400">
+    <div class="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
+      <span>건축 적산 및 공학 교육 지원 인터랙티브 러닝 시스템</span>
+      <span class="text-slate-500 font-medium">창호 및 유리공사 적산 강의 기반 완성본</span>
+    </div>
+  </footer>
+
+  <script>
+    /* Data definition for 10 Flashcards */
+    const flashcardsData = [
+      {
+        id: 1,
+        category: "창호 기호 및 표기",
+        front: "창호 기호 표기에서 상부와 하부의 의미",
+        back: "상부는 일련번호(구분 번호), 하부는 창호 재질과 용도를 나타내는 알파벳 기호입니다.",
+        mastered: false
+      },
+      {
+        id: 2,
+        category: "창호 기호 및 표기",
+        front: "창호 기호 'PW'와 'PD'의 뜻",
+        back: "PW는 플라스틱(합성수지제) 창문(Window), PD는 플라스틱(합성수지제) 문(Door)입니다.",
+        mastered: false
+      },
+      {
+        id: 3,
+        category: "창호 하드웨어",
+        front: "크리센트 (Crescent)",
+        back: "주로 미서기창(슬라이딩 창) 창짝에 부착되어 기밀 유지와 잠금을 담당하는 반달형 철물입니다.",
+        mastered: false
+      },
+      {
+        id: 4,
+        category: "창호 하드웨어",
+        front: "도어 체크 (Door Closer)",
+        back: "문 윗틀과 문짝에 설치되어 문이 닫히는 속도를 유압 등으로 완충 및 제어하는 철물입니다.",
+        mastered: false
+      },
+      {
+        id: 5,
+        category: "시공 및 사춤",
+        front: "창호 사춤(모르타르 충전)을 하는 이유",
+        back: "콘크리트 타설 압력에 의한 거푸집 변형을 고려해 개구부를 여유 있게 시공하므로, 프레임 설치 후 빈 틈새를 메우기 위함입니다.",
+        mastered: false
+      },
+      {
+        id: 6,
+        category: "산출 기준",
+        front: "출입문의 창호 모르타르 충전 산출 면수",
+        back: "3면입니다. (바닥면은 바닥 미장 공사 시 일체 시공되므로 상부 1면과 좌우 2면만 산출)",
+        mastered: false
+      },
+      {
+        id: 7,
+        category: "유리 자재",
+        front: "로이유리 (Low-E Glass)",
+        back: "유리 표면에 금속산화물 박막을 코팅하여 실내 난방 적외선 열이 외부로 방출되지 않도록 차단하는 고단열 유리입니다.",
+        mastered: false
+      },
+      {
+        id: 8,
+        category: "유리 시공",
+        front: "세팅 블록 (Setting Block)",
+        back: "창틀 하부에 설치하여 유리 하부의 직접 충돌을 방지하고 프레임과의 일정한 간격을 유지시키는 완충 받침재입니다.",
+        mastered: false
+      },
+      {
+        id: 9,
+        category: "유리 면적 산출",
+        front: "유리 면적 약식 산출 시 0.9 ~ 0.95를 곱하는 이유",
+        back: "창호 외곽 치수를 기준으로 계산할 때 창호 프레임(울거미)이 차지하는 면적을 공제하기 위함입니다.",
+        mastered: false
+      },
+      {
+        id: 10,
+        category: "코킹 산출",
+        front: "2짝 미서기창 유리 코킹 계산 시 높이에 4를 곱하는 이유",
+        back: "창짝이 2개이므로 창틀 좌우 2변 외에 가운데 겹치는 수직 프레임 선 2변이 추가되어 총 4개의 수직 선분이 생기기 때문입니다.",
+        mastered: false
+      }
+    ];
+
+    /* Quiz Answers and Solutions */
+    const quizSolutions = {
+      1: {
+        answer: "3",
+        solution: "정답은 ③번입니다. 'P'는 합성수지(Plastic)를 나타내며, 목재는 'W(Wood)'로 표기합니다. 따라서 PW는 합성수지제 창문입니다."
+      },
+      2: {
+        answer: "2",
+        solution: "정답은 ②번입니다. 창호는 제작, 운반, 설치, 철물, 보양이 포함된 외주 단가로 개소당 일괄 산출합니다. 문 사춤은 바닥 제외 3면이며, 내부 문은 외부 코킹을 제외합니다."
+      },
+      3: {
+        answer: "3",
+        solution: "정답은 ③번입니다. 정미 치수 일람표가 없을 경우 창호 외곽 면적에 공제 계수 0.9~0.95를 곱해 산출합니다. 세팅블록은 하부 받침재이며 유리 코킹은 양면(2회) 도포합니다."
+      },
+      4: {
+        answer: 15.0,
+        tolerance: 0.1,
+        solution: "정답은 15.0 m입니다. 문 1개소당 바닥 제외 3면 길이 = 1.0 + (2.0 × 2) = 5.0 m. 총 3개소이므로 5.0 × 3 = 15.0 m입니다."
+      },
+      5: {
+        answer: 10.08,
+        tolerance: 0.05,
+        solution: "정답은 10.08 m입니다. 2짝 미서기창 선분 합 = (1.2 × 2) + (0.8 × 4) = 2.4 + 3.2 = 5.6 m. 양면 시공 및 0.9 계수 적용 시 5.6 × 0.9 × 2 = 10.08 m입니다."
+      }
+    };
+
+    /* State Variables */
+    let currentCardIndex = 0;
+    let isFlipped = false;
+
+    // Toast helper
+    function showToast(title, message, isSuccess = true) {
+      const box = document.getElementById('toastBox');
+      const icon = document.getElementById('toastIcon');
+      document.getElementById('toastTitle').textContent = title;
+      document.getElementById('toastMessage').textContent = message;
+
+      if (isSuccess) {
+        icon.className = 'w-7 h-7 rounded-lg bg-emerald-600 flex items-center justify-center text-xs text-white';
+        icon.innerHTML = '<i class="fa-solid fa-check"></i>';
+      } else {
+        icon.className = 'w-7 h-7 rounded-lg bg-rose-600 flex items-center justify-center text-xs text-white';
+        icon.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i>';
+      }
+
+      box.classList.remove('translate-y-20', 'opacity-0');
+      box.classList.add('translate-y-0', 'opacity-100');
+
+      setTimeout(() => {
+        box.classList.remove('translate-y-0', 'opacity-100');
+        box.classList.add('translate-y-20', 'opacity-0');
+      }, 2800);
+    }
+
+    document.querySelectorAll('.nav-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        // Toggle tab styles
+        document.querySelectorAll('.nav-tab').forEach(t => {
+          t.classList.remove('bg-indigo-600', 'text-white', 'shadow-sm');
+          t.classList.add('text-slate-600');
+        });
+        tab.classList.remove('text-slate-600');
+        tab.classList.add('bg-indigo-600', 'text-white', 'shadow-sm');
+
+        // Toggle pane visibility
+        const targetId = tab.getAttribute('data-target');
+        document.querySelectorAll('.tab-pane').forEach(pane => {
+          pane.classList.add('hidden');
+          pane.classList.remove('block');
+        });
+        const targetPane = document.getElementById(targetId);
+        if (targetPane) {
+          targetPane.classList.remove('hidden');
+          targetPane.classList.add('block');
+        }
+      });
+    });
+
+    // Header Quick Calc Button
+    document.getElementById('calculatorQuickBtn').addEventListener('click', () => {
+      const calcTab = document.querySelector('.nav-tab[data-target="tab-calc"]');
+      if (calcTab) calcTab.click();
+    });
+
+    const cardInner = document.getElementById('cardInner');
+    const flashcardBox = document.getElementById('flashcardBox');
+
+    function renderFlashcard() {
+      const card = flashcardsData[currentCardIndex];
+      // Reset flip
+      isFlipped = false;
+      cardInner.classList.remove('rotate-y-180');
+
+      // Update contents
+      document.getElementById('cardCategory').textContent = card.category;
+      document.getElementById('cardFrontText').textContent = card.front;
+      document.getElementById('cardBackText').textContent = card.back;
+      document.getElementById('flashcardCounter').textContent = `${currentCardIndex + 1} / ${flashcardsData.length}`;
+
+      const masteredBtn = document.getElementById('markMasteredBtn');
+      const masteredText = document.getElementById('masteredBtnText');
+      if (card.mastered) {
+        masteredBtn.classList.remove('bg-emerald-50', 'text-emerald-700', 'border-emerald-200');
+        masteredBtn.classList.add('bg-emerald-600', 'text-white', 'border-emerald-600');
+        masteredText.textContent = "암기 완료!";
+      } else {
+        masteredBtn.classList.remove('bg-emerald-600', 'text-white', 'border-emerald-600');
+        masteredBtn.classList.add('bg-emerald-50', 'text-emerald-700', 'border-emerald-200');
+        masteredText.textContent = "외웠어요";
+      }
+
+      renderDots();
+    }
+
+    function renderDots() {
+      const container = document.getElementById('flashcardDots');
+      container.innerHTML = '';
+      flashcardsData.forEach((c, idx) => {
+        const dot = document.createElement('div');
+        dot.className = `w-2 h-2 rounded-full transition-all cursor-pointer ${
+          idx === currentCardIndex 
+            ? 'w-6 bg-indigo-600' 
+            : (c.mastered ? 'bg-emerald-400' : 'bg-slate-300')
+        }`;
+        dot.addEventListener('click', () => {
+          currentCardIndex = idx;
+          renderFlashcard();
+        });
+        container.appendChild(dot);
+      });
+    }
+
+    flashcardBox.addEventListener('click', () => {
+      isFlipped = !isFlipped;
+      if (isFlipped) {
+        cardInner.classList.add('rotate-y-180');
+      } else {
+        cardInner.classList.remove('rotate-y-180');
+      }
+    });
+
+    document.getElementById('nextCardBtn').addEventListener('click', () => {
+      if (currentCardIndex < flashcardsData.length - 1) {
+        currentCardIndex++;
+      } else {
+        currentCardIndex = 0;
+      }
+      renderFlashcard();
+    });
+
+    document.getElementById('prevCardBtn').addEventListener('click', () => {
+      if (currentCardIndex > 0) {
+        currentCardIndex--;
+      } else {
+        currentCardIndex = flashcardsData.length - 1;
+      }
+      renderFlashcard();
+    });
+
+    document.getElementById('markMasteredBtn').addEventListener('click', () => {
+      flashcardsData[currentCardIndex].mastered = !flashcardsData[currentCardIndex].mastered;
+      renderFlashcard();
+      if (flashcardsData[currentCardIndex].mastered) {
+        showToast("암기 완료", `[카드 ${currentCardIndex + 1}]을(를) 마스터 목록에 추가했습니다!`);
+      }
+    });
+
+    document.getElementById('resetMasteredBtn').addEventListener('click', () => {
+      flashcardsData.forEach(c => c.mastered = false);
+      renderFlashcard();
+      showToast("초기화 완료", "모든 카드의 암기 상태가 초기화되었습니다.");
+    });
+
+    document.getElementById('submitQuizBtn').addEventListener('click', () => {
+      let score = 0;
+      let total = 5;
+
+      // Question 1
+      const q1Val = document.querySelector('input[name="q1"]:checked')?.value;
+      const card1 = document.querySelector('.quiz-card[data-qid="1"]');
+      const fb1 = card1.querySelector('.feedback');
+      const ind1 = card1.querySelector('.status-indicator');
+      ind1.classList.remove('hidden');
+      fb1.classList.remove('hidden');
+
+      if (q1Val === quizSolutions[1].answer) {
+        score++;
+        ind1.textContent = '정답 ✓';
+        ind1.className = 'status-indicator text-xs font-bold text-emerald-600';
+        fb1.className = 'feedback mt-4 p-3.5 rounded-xl text-xs leading-relaxed bg-emerald-50 text-emerald-900 border border-emerald-200';
+      } else {
+        ind1.textContent = '오답 ✗';
+        ind1.className = 'status-indicator text-xs font-bold text-rose-600';
+        fb1.className = 'feedback mt-4 p-3.5 rounded-xl text-xs leading-relaxed bg-rose-50 text-rose-900 border border-rose-200';
+      }
+      fb1.textContent = quizSolutions[1].solution;
+
+      // Question 2
+      const q2Val = document.querySelector('input[name="q2"]:checked')?.value;
+      const card2 = document.querySelector('.quiz-card[data-qid="2"]');
+      const fb2 = card2.querySelector('.feedback');
+      const ind2 = card2.querySelector('.status-indicator');
+      ind2.classList.remove('hidden');
+      fb2.classList.remove('hidden');
+
+      if (q2Val === quizSolutions[2].answer) {
+        score++;
+        ind2.textContent = '정답 ✓';
+        ind2.className = 'status-indicator text-xs font-bold text-emerald-600';
+        fb2.className = 'feedback mt-4 p-3.5 rounded-xl text-xs leading-relaxed bg-emerald-50 text-emerald-900 border border-emerald-200';
+      } else {
+        ind2.textContent = '오답 ✗';
+        ind2.className = 'status-indicator text-xs font-bold text-rose-600';
+        fb2.className = 'feedback mt-4 p-3.5 rounded-xl text-xs leading-relaxed bg-rose-50 text-rose-900 border border-rose-200';
+      }
+      fb2.textContent = quizSolutions[2].solution;
+
+      // Question 3
+      const q3Val = document.querySelector('input[name="q3"]:checked')?.value;
+      const card3 = document.querySelector('.quiz-card[data-qid="3"]');
+      const fb3 = card3.querySelector('.feedback');
+      const ind3 = card3.querySelector('.status-indicator');
+      ind3.classList.remove('hidden');
+      fb3.classList.remove('hidden');
+
+      if (q3Val === quizSolutions[3].answer) {
+        score++;
+        ind3.textContent = '정답 ✓';
+        ind3.className = 'status-indicator text-xs font-bold text-emerald-600';
+        fb3.className = 'feedback mt-4 p-3.5 rounded-xl text-xs leading-relaxed bg-emerald-50 text-emerald-900 border border-emerald-200';
+      } else {
+        ind3.textContent = '오답 ✗';
+        ind3.className = 'status-indicator text-xs font-bold text-rose-600';
+        fb3.className = 'feedback mt-4 p-3.5 rounded-xl text-xs leading-relaxed bg-rose-50 text-rose-900 border border-rose-200';
+      }
+      fb3.textContent = quizSolutions[3].solution;
+
+      // Question 4
+      const q4Input = parseFloat(document.getElementById('q4Input').value);
+      const card4 = document.querySelector('.quiz-card[data-qid="4"]');
+      const fb4 = card4.querySelector('.feedback');
+      const ind4 = card4.querySelector('.status-indicator');
+      ind4.classList.remove('hidden');
+      fb4.classList.remove('hidden');
+
+      if (!isNaN(q4Input) && Math.abs(q4Input - quizSolutions[4].answer) <= quizSolutions[4].tolerance) {
+        score++;
+        ind4.textContent = '정답 ✓';
+        ind4.className = 'status-indicator text-xs font-bold text-emerald-600';
+        fb4.className = 'feedback mt-4 p-3.5 rounded-xl text-xs leading-relaxed bg-emerald-50 text-emerald-900 border border-emerald-200';
+      } else {
+        ind4.textContent = '오답 ✗';
+        ind4.className = 'status-indicator text-xs font-bold text-rose-600';
+        fb4.className = 'feedback mt-4 p-3.5 rounded-xl text-xs leading-relaxed bg-rose-50 text-rose-900 border border-rose-200';
+      }
+      fb4.textContent = quizSolutions[4].solution;
+
+      // Question 5
+      const q5Input = parseFloat(document.getElementById('q5Input').value);
+      const card5 = document.querySelector('.quiz-card[data-qid="5"]');
+      const fb5 = card5.querySelector('.feedback');
+      const ind5 = card5.querySelector('.status-indicator');
+      ind5.classList.remove('hidden');
+      fb5.classList.remove('hidden');
+
+      if (!isNaN(q5Input) && Math.abs(q5Input - quizSolutions[5].answer) <= quizSolutions[5].tolerance) {
+        score++;
+        ind5.textContent = '정답 ✓';
+        ind5.className = 'status-indicator text-xs font-bold text-emerald-600';
+        fb5.className = 'feedback mt-4 p-3.5 rounded-xl text-xs leading-relaxed bg-emerald-50 text-emerald-900 border border-emerald-200';
+      } else {
+        ind5.textContent = '오답 ✗';
+        ind5.className = 'status-indicator text-xs font-bold text-rose-600';
+        fb5.className = 'feedback mt-4 p-3.5 rounded-xl text-xs leading-relaxed bg-rose-50 text-rose-900 border border-rose-200';
+      }
+      fb5.textContent = quizSolutions[5].solution;
+
+      // Update Score Badge
+      const scoreBadge = document.getElementById('quizScoreBadge');
+      scoreBadge.textContent = `채점 결과: ${score} / ${total}점 (${(score/total*100).toFixed(0)}점)`;
+      if (score === total) {
+        scoreBadge.className = 'text-xs font-extrabold px-3 py-1.5 bg-emerald-100 text-emerald-800 rounded-xl border border-emerald-300';
+        showToast("만점 달성!", "축하합니다! 5문항을 모두 정확히 풀이하셨습니다.");
+      } else {
+        scoreBadge.className = 'text-xs font-extrabold px-3 py-1.5 bg-amber-100 text-amber-800 rounded-xl border border-amber-300';
+        showToast("채점 완료", `총 ${score}문항을 맞히셨습니다. 오답 해설을 확인해 보세요.`, false);
+      }
+    });
+
+    document.getElementById('resetQuizBtn').addEventListener('click', () => {
+      document.querySelectorAll('input[type="radio"]').forEach(r => r.checked = false);
+      document.getElementById('q4Input').value = '';
+      document.getElementById('q5Input').value = '';
+      document.querySelectorAll('.feedback').forEach(f => f.classList.add('hidden'));
+      document.querySelectorAll('.status-indicator').forEach(s => s.classList.add('hidden'));
+      const scoreBadge = document.getElementById('quizScoreBadge');
+      scoreBadge.textContent = '점수: 대기 중';
+      scoreBadge.className = 'text-xs font-extrabold px-3 py-1.5 bg-slate-100 text-slate-700 rounded-xl border border-slate-200';
+      showToast("퀴즈 초기화", "모든 문제 답안이 초기화되었습니다.");
+    });
+
+    let currentCalcType = 'window'; // 'window' or 'door'
+
+    const typeWindowBtn = document.getElementById('typeWindowBtn');
+    const typeDoorBtn = document.getElementById('typeDoorBtn');
+    const calcW = document.getElementById('calcW');
+    const calcH = document.getElementById('calcH');
+    const calcQty = document.getElementById('calcQty');
+    const calcFactor = document.getElementById('calcFactor');
+    const calcExterior = document.getElementById('calcExterior');
+    const calcTwoSash = document.getElementById('calcTwoSash');
+
+    typeWindowBtn.addEventListener('click', () => {
+      currentCalcType = 'window';
+      typeWindowBtn.className = 'calc-type-btn py-2.5 px-3 rounded-xl border-2 border-indigo-600 bg-indigo-50/50 text-indigo-700 font-bold text-xs flex items-center justify-center gap-1.5 transition';
+      typeDoorBtn.className = 'calc-type-btn py-2.5 px-3 rounded-xl border border-slate-200 bg-white text-slate-600 font-semibold text-xs flex items-center justify-center gap-1.5 transition';
+      document.getElementById('calcBadgeType').textContent = '창문 4면 적용';
+      calcExterior.checked = true;
+      recalculate();
+    });
+
+    typeDoorBtn.addEventListener('click', () => {
+      currentCalcType = 'door';
+      typeDoorBtn.className = 'calc-type-btn py-2.5 px-3 rounded-xl border-2 border-indigo-600 bg-indigo-50/50 text-indigo-700 font-bold text-xs flex items-center justify-center gap-1.5 transition';
+      typeWindowBtn.className = 'calc-type-btn py-2.5 px-3 rounded-xl border border-slate-200 bg-white text-slate-600 font-semibold text-xs flex items-center justify-center gap-1.5 transition';
+      document.getElementById('calcBadgeType').textContent = '문 3면 적용 (바닥 제외)';
+      calcExterior.checked = false; // 문은 보통 실내거나 별도
+      recalculate();
+    });
+
+    function recalculate() {
+      const W = parseFloat(calcW.value) || 0;
+      const H = parseFloat(calcH.value) || 0;
+      const qty = parseInt(calcQty.value) || 1;
+      const factor = parseFloat(calcFactor.value) || 0.9;
+      const isExt = calcExterior.checked;
+      const is2Sash = calcTwoSash.checked;
+
+      // 1. 모르타르 사춤
+      let mortarPerUnit = 0;
+      let mortarFormulaStr = '';
+      if (currentCalcType === 'window') {
+        mortarPerUnit = 2 * (W + H);
+        mortarFormulaStr = `2 × (${W} + ${H}) × ${qty}개소`;
+      } else {
+        mortarPerUnit = W + (2 * H);
+        mortarFormulaStr = `{${W} + (2 × ${H})} × ${qty}개소`;
+      }
+      const totalMortar = mortarPerUnit * qty;
+      document.getElementById('resMortar').innerHTML = `${totalMortar.toFixed(2)} <span class="text-xs font-semibold text-slate-500">m</span>`;
+      document.getElementById('resMortarFormula').textContent = mortarFormulaStr;
+
+      // 2. 외측 둘레 코킹
+      let totalExtCaulk = 0;
+      if (isExt) {
+        const perUnitCaulk = (currentCalcType === 'window') ? 2 * (W + H) : (W + 2 * H);
+        totalExtCaulk = perUnitCaulk * qty;
+        document.getElementById('resExtCaulk').innerHTML = `${totalExtCaulk.toFixed(2)} <span class="text-xs font-semibold text-slate-500">m</span>`;
+        document.getElementById('resExtCaulkFormula').textContent = `외기 면함 (${perUnitCaulk.toFixed(2)}m × ${qty}개소)`;
+      } else {
+        document.getElementById('resExtCaulk').innerHTML = `0.00 <span class="text-xs font-semibold text-slate-500">m</span>`;
+        document.getElementById('resExtCaulkFormula').textContent = `실내면 창호 (외부 코킹 제외)`;
+      }
+
+      // 3. 유리 면적
+      const glassPerUnit = (W * H) * factor;
+      const totalGlassArea = glassPerUnit * qty;
+      document.getElementById('resGlassArea').innerHTML = `${totalGlassArea.toFixed(3)} <span class="text-xs font-semibold text-slate-500">m²</span>`;
+      document.getElementById('resGlassAreaFormula').textContent = `(${W} × ${H} × ${factor}) × ${qty}개소`;
+
+      // 4. 유리 주위 코킹 (양면 2회 도포)
+      // 2짝 미서기창: 수평 2W, 수직 4H (한짝 고정창이면 2W + 2H)
+      const vertCount = is2Sash ? 4 : 2;
+      const glassCaulkPerUnit = ((2 * W) + (vertCount * H)) * factor * 2; // 양면 곱하기 2
+      const totalGlassCaulk = glassCaulkPerUnit * qty;
+
+      document.getElementById('resGlassCaulk').textContent = totalGlassCaulk.toFixed(2);
+      document.getElementById('resGlassCaulkFormula').textContent = 
+        `{(2 × ${W}) + (${vertCount} × ${H})} × ${factor} × 2(양면) × ${qty}개소`;
+    }
+
+    // Attach Calculator Input Listeners
+    [calcW, calcH, calcQty, calcFactor, calcExterior, calcTwoSash].forEach(el => {
+      el.addEventListener('input', recalculate);
+      el.addEventListener('change', recalculate);
+    });
+
+    // Preset Example Button (PW02)
+    document.getElementById('loadPresetBtn').addEventListener('click', () => {
+      typeWindowBtn.click();
+      calcW.value = "1.2";
+      calcH.value = "0.8";
+      calcQty.value = "2";
+      calcFactor.value = "0.9";
+      calcExterior.checked = true;
+      calcTwoSash.checked = true;
+      recalculate();
+      showToast("예제 적용", "강의 예제(PW02: 1.2m × 0.8m, 2개소) 수치가 적용되었습니다.");
+    });
+
+    document.getElementById('tableSearch').addEventListener('input', (e) => {
+      const q = e.target.value.toLowerCase().trim();
+      const rows = document.querySelectorAll('#cheatSheetTable tbody tr');
+      rows.forEach(r => {
+        const text = r.textContent.toLowerCase();
+        if (text.includes(q)) {
+          r.style.display = '';
+        } else {
+          r.style.display = 'none';
+        }
+      });
+    });
+
+    // Initial Execution on Load
+    window.addEventListener('DOMContentLoaded', () => {
+      renderFlashcard();
+      recalculate();
+    });
+  </script>
+</body>
+</html>
